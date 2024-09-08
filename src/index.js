@@ -1,10 +1,11 @@
 import express from 'express'
+import morgan from 'morgan'
 import { PORT } from './config/config.js'
-
-import userRoutes from './routes/auserRouters.js'
-import postRoutes from './routes/bpostRoutes.js'
-import categoryRoutes from './routes/categoryRoutes.js'
-import commentRoutes from './routes/commentRoutes.js'
+import routerUser from './Routes/user.routes.js'
+import routerIncident from './Routes/incident.routes.js'
+import routerComment from './Routes/comment.routes.js'
+import routerAuth from './Routes/auth.routes.js'
+import { validCors } from './middleware/validCords.js'
 
 const app= express()
 app.use(morgan('dev'))
