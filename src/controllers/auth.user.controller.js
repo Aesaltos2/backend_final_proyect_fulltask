@@ -12,9 +12,8 @@ export const authUser = async (req, res) => {
 
     const validacion = await compare(password, user[0].password)
     if (!validacion) return res.status(400).json({ message: 'Credenciales incorrectas' })
-
-    const authtoken = jwt.sign({ userId: user[0].userId }, SECRET_KEY, { expiresIn: '1h' })
-
+    const authtoken = jwt.sign({ userId: user[0].id }, SECRET_KEY, { expiresIn: '1h' })
+    console.log(authtoken);
     delete user[0].password
     res.json({
         authtoken,

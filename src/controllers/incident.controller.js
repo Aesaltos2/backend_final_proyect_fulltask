@@ -7,6 +7,7 @@ export const incidentId = async (req, res) => {
     try {
         const { id } = req.params
         const incId = await IncidentModel.incdId(id)
+        console.log(incId);
         if (incId.length === 0) return res.status(400).json({ message: 'No se encontro incidente' })
         res.status(200).json(incId);
     } catch (error) {
@@ -28,13 +29,10 @@ export const incidentAll = async (req, res) => {
 
 export const incidentCreate = async (req, res) => {
     try {
-        const { userId, title, description, ubication, type, status, date } = req.body
+        const { usuario_id, asunto, descripcion, tipo,  estado, fecha_creacion } = req.body
 
-        const files = req.files
-        const arrayImg = await files.map((im) => im.originalname)
-        const imagens = JSON.stringify(arrayImg)
-        if (userId && title && description && ubication && type && status && date) {
-            const incinew = await IncidentModel.incdCreate({ userId, title, imagens, description, ubication, type, status, date })
+        if (usuario_id && asunto && descripcion && tipo && estado && fecha_creacion) {
+            const incinew = await IncidentModel.incdCreate({ usuario_id, asunto, descripcion, tipo,  estado, fecha_creacion })
             if (incinew.affectedRows === 1) return res.status(200).json({ message: 'Se ha creado el incidente' })
             if (incinew.affectedRows === 0) return res.status(400).json({ message: 'Error al crear el incidente' })
         }
