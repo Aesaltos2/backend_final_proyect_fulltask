@@ -7,7 +7,6 @@ export const incidentId = async (req, res) => {
     try {
         const { id } = req.params
         const incId = await IncidentModel.incdId(id)
-        console.log(incId);
         if (incId.length === 0) return res.status(400).json({ message: 'No se encontro incidente' })
         res.status(200).json(incId);
     } catch (error) {
@@ -29,10 +28,10 @@ export const incidentAll = async (req, res) => {
 
 export const incidentCreate = async (req, res) => {
     try {
-        const { usuario_id, asunto, descripcion, tipo,  estado, fecha_creacion } = req.body
+        const { usuario_id, asunto, descripcion, tipo,  estado } = req.body
 
-        if (usuario_id && asunto && descripcion && tipo && estado && fecha_creacion) {
-            const incinew = await IncidentModel.incdCreate({ usuario_id, asunto, descripcion, tipo,  estado, fecha_creacion })
+        if (usuario_id && asunto && descripcion && tipo && estado) {
+            const incinew = await IncidentModel.incdCreate({ usuario_id, asunto, descripcion, tipo,  estado })
             if (incinew.affectedRows === 1) return res.status(200).json({ message: 'Se ha creado el incidente' })
             if (incinew.affectedRows === 0) return res.status(400).json({ message: 'Error al crear el incidente' })
         }
@@ -47,40 +46,11 @@ export const incidentCreate = async (req, res) => {
 
 export const incidenUpdate = async (req, res) => {
     try {
-        const { title, description, ubication, type, status, date } = req.body
+        const { asunto, descripcion, tipo, estado, fecha_creacion } = req.body
         const { id } = req.params
 
-        let imagens;
-        if (req.files && req.files.length > 0) {
-            const files = req.files
-            const arrayImg = await files.map((im) => im.originalname)
-            imagens = JSON.stringify(arrayImg)
-
-            const incidentImg = await pool.execute('SELECT imagens FROM incident WHERE id = ?', [id]);
-            const totalImages = await JSON.parse(incidentImg[0][0].imagens);
-
-            const imgDelt = totalImages.filter((img) => !arrayImg.includes(img))
-
-            await Promise.all(imgDelt.map(async (image) => {
-                try {
-                    await fs.unlink(`./public/images/${image}`);
-                    console.log(`Imagen ${image} eliminada correctamente.`);
-                } catch (err) {
-                    if (err.errno === -4058) {
-                        console.error(`No se encuentra la imagen ${image}`);
-                    } else {
-                        console.error(`Error al eliminar la imagen ${image}:`, err);
-                        throw err;
-                    }
-                }
-            }));
-        } else {
-            const incidentImg = await pool.execute('SELECT imagens FROM incident WHERE id = ?', [id]);
-            imagens = incidentImg[0][0].imagens
-        }
-
-        if (title || description || ubication || type || status || date || id) {
-            const incinew = await IncidentModel.incdUpdate({ title, imagens, description, ubication, type, status, date, id })
+        if (asunto || descripcion || tipo || estado || fecha_creacion || id) {
+            const incinew = await IncidentModel.incdUpdate({ asunto, descripcion, tipo, estado, fecha_creacion, id })
             if (incinew.affectedRows === 1) return res.status(200).json({ message: 'Incidente actualizado con exito' })
             if (incinew.affectedRows === 0) return res.status(400).json({ message: 'Error al actualizar el incidente' })
         }
@@ -103,21 +73,7 @@ export const incidentFromUs = async (req, res) => {
     }
 
 }
-export const getImg = async (req, res) => {
-    try {
-        const { name } = req.params
-        const ruta = path.resolve(`./images/${name}`)
-        await fs.access(ruta)
 
-        res.sendFile(ruta)
-
-    } catch (error) {
-        if (error.errno === -4058) { return res.status(404).json({ message: 'La foto no se pudo encontrar' }) }
-
-        res.status(500).json({ message: error.message })
-    }
-
-}
 export const incidentDelete = async (req, res) => {
     try {
         const { id } = req.params
